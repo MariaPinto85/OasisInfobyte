@@ -1,0 +1,54 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.express as px
+
+data = pd.read_csv('Unemployment_Rate_upto_11_2020.csv')
+print(data.head())
+missing_values = data.isnull().sum()
+print(missing_values)
+plt.figure(figsize=(14, 10))
+sns.heatmap(data[[' Estimated Unemployment Rate (%)',
+ ' Estimated Employed',
+ ' Estimated Labour Participation Rate (%)','longitude',
+ 'latitude']].corr())
+plt.title("Correlation Heatmap")
+plt.show()
+plt.figure(figsize=(12, 10))
+plt.title("Indian Unemployment - Employed Population")
+sns.histplot(x=" Estimated Employed", hue="Region", data=data)
+plt.show()
+plt.figure(figsize=(12, 10))
+plt.title("Indian Unemployment - Unemployment Rate")
+sns.histplot(x=" Estimated Unemployment Rate (%)", hue="Region", data=data)
+plt.show()
+# Filter for top 5 regions with the highest average unemployment rates
+top_regions = data.groupby('Region')[' Estimated Unemployment Rate (%)'].mean().nlargest(5).index
+data_top_regions = data[data['Region'].isin(top_regions)]
+
+# Unemployment Trends Over Time (Top 5 Regions)
+plt.figure(figsize=(12, 6))
+sns.lineplot(data=data_top_regions, x=' Date', y=' Estimated Unemployment Rate (%)', hue='Region')
+plt.title(' Unemployment Rate Over Time (Top 5 Regions)')
+plt.legend(title='Region', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
+# Filter for top 10 regions with the highest average unemployment rates
+top10_regions = data.groupby('Region')[' Estimated Unemployment Rate (%)'].mean().nlargest(10).index
+data_top10_regions = data[data['Region'].isin(top10_regions)]
+
+# Regional Analysis (Top 10 Regions)
+regional_avg_unemployment = data_top10_regions.groupby('Region')[' Estimated Unemployment Rate (%)'].mean().reset_index()
+plt.figure(figsize=(12, 6))
+sns.barplot(data=regional_avg_unemployment, x='Region', y=' Estimated Unemployment Rate (%)')
+plt.title('Average Unemployment Rate by Region (Top 10 Regions)')
+plt.xticks(rotation=45)
+plt.show()
+# Employment Statistics (Top 5 Regions)
+plt.figure(figsize=(12, 6))
+sns.lineplot(data=data_top_regions, x=' Date', y=' Estimated Employed', hue='Region')
+plt.title('Estimated Employed Over Time (Top 5 Regions)')
+plt.legend(title='Region', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
+
+
